@@ -5,70 +5,73 @@ slice: "A"
 gedrag: "De gebruiker voegt een todo met een titel toe, ziet hem onderaan de lijst en ziet een melding als laden of toevoegen mislukt; de API weigert een te grote body."
 profielversie: 1
 branch: "factory/001-todo-app-a"
-bijgewerkt: "2026-10-11T18:45"
+bijgewerkt: "2026-10-11T18:48"
 
-fase: tests
+fase: wacht-op-mens
 ronde: 0
 testconflicten: 0
-wacht_op_mens: null
+wacht_op_mens:
+  reden: "geblokkeerd"
+  sinds: "2026-10-11T18:48"
+  vraag: "Mag Playwright eenmalig Chromium downloaden (npx playwright install chromium, nieuw internetdomein), zodat de e2e-tests lokaal kunnen draaien en rood/groen controleerbaar is?"
 
-volgende_stap: "testagent schrijft de tests voor slice A (AC-1 t/m AC-14, AC-44)"
+volgende_stap: "na besluit over de Playwright-browser: e2e-tests van slice A draaien en controleren dat ze rood zijn om ontbrekend gedrag; dan fase bouwen, ronde 1, bouwer starten"
 resterend_werk:
-  - "tests schrijven (testagent)"
+  - "e2e-tests controleren op rood om de juiste reden"
   - "bouwen (bouwer)"
   - "review (security, ui, ux)"
   - "opleverpakket"
 
 tests:
-  commit: null
-  aantal: 0
+  commit: "081d84e"
+  aantal: 15
 
 dekking:
   - criterium: AC-1
-    test: ""
-    status: geen-test
+    test: "tests/factory/e2e/slice-a.spec.ts::AC-1: een lege lijst toont \"Nog niets te doen.\" en geen listitem"
+    status: rood
   - criterium: AC-2
-    test: ""
-    status: geen-test
+    test: "tests/factory/e2e/slice-a.spec.ts::AC-2: Melk kopen toevoegen met Enter toont één listitem, leegt het veld en verbergt de lege tekst"
+    status: rood
   - criterium: AC-3
-    test: ""
-    status: geen-test
+    test: "tests/factory/e2e/slice-a.spec.ts::AC-3: toevoegen met de knop zet nieuwe todos onderaan"
+    status: rood
   - criterium: AC-4
-    test: ""
-    status: geen-test
+    test: "tests/factory/e2e/slice-a.spec.ts::AC-4: na herladen staan Melk kopen en Brood er nog, in dezelfde volgorde"
+    status: rood
   - criterium: AC-5
-    test: ""
-    status: geen-test
+    test: "tests/factory/e2e/slice-a.spec.ts::AC-5: drie spaties toevoegen geeft geen listitem, ook niet na herladen"
+    status: rood
   - criterium: AC-6
-    test: ""
-    status: geen-test
+    test: "tests/factory/e2e/slice-a.spec.ts::AC-6: <b>vet</b> wordt letterlijk getoond en niet als b-element"
+    status: rood
   - criterium: AC-7
-    test: ""
-    status: geen-test
+    test: "tests/factory/unit/slice-a.spec.ts::AC-7: het invoerveld \"Nieuwe taak\" heeft maxlength=\"200\""
+    status: groen
   - criterium: AC-8
-    test: ""
-    status: geen-test
+    test: "tests/factory/e2e/slice-a.spec.ts::AC-8: een mislukte POST toont een alert, houdt de invoer en voegt niets toe"
+    status: rood
   - criterium: AC-9
-    test: ""
-    status: geen-test
+    test: "tests/factory/e2e/slice-a.spec.ts::AC-9: na een geslaagde nieuwe poging is de alert weg en staat Melk kopen in de lijst"
+    status: rood
   - criterium: AC-10
-    test: ""
-    status: geen-test
+    test: "tests/factory/e2e/slice-a.spec.ts::AC-10: een mislukte GET toont \"Laden mislukt\" en niet \"Nog niets te doen.\""
+    status: rood
   - criterium: AC-11
-    test: ""
-    status: geen-test
+    test: "tests/factory/server/slice-a.test.ts::AC-11: een lege database geeft 200 en []; daarna staan beide todos in volgorde van aanmaken"
+    status: groen
   - criterium: AC-12
-    test: ""
-    status: geen-test
+    test: "tests/factory/server/slice-a.test.ts::AC-12: POST met spaties rond de titel geeft 201 met getrimde titel, gedaan false en een geheel getal als id"
+    status: groen
   - criterium: AC-13
-    test: ""
-    status: geen-test
+    test: "tests/factory/server/slice-a.test.ts::AC-13: weigert met 400 en laat de lijst leeg (5 varianten)"
+    status: groen
   - criterium: AC-14
-    test: ""
-    status: geen-test
+    test: "tests/factory/server/slice-a.test.ts::AC-14: een titel van precies 200 tekens geeft 201 en wordt volledig opgeslagen"
+    status: groen
   - criterium: AC-44
-    test: ""
-    status: geen-test
+    test: "tests/factory/server/slice-a.test.ts::AC-44: een body van 10 240 bytes mag, 10 241 bytes en 20 000 bytes chunked geven 413 en veranderen niets"
+    status: rood
 
 bevindingen: []
 
@@ -79,6 +82,12 @@ verloop:
     gebeurtenis: "Spec 001-todo-app versie 1 goedgekeurd door Jeffrey Bijl, na verwerking van zes open vragen; basisbranch main (keuze van de mens: origin/dev loopt achter); npm ci gedraaid met akkoord van de mens"
   - tijd: "2026-10-11T18:45"
     gebeurtenis: "Lokale git-identiteit Jeff-Software-Factory ingesteld (keuze van de mens); slice A opgezet op factory/001-todo-app-a vanaf main"
+  - tijd: "2026-10-11T18:48"
+    gebeurtenis: "Testagent: tests gecommit in 081d84e (alleen tests/factory/, gecontroleerd). Ratchet telt 15 tests (de testagent meldde 19). npm test: AC-44 rood om ontbrekend gedrag (201 i.p.v. 413); AC-7 en AC-11 t/m AC-14 al groen (bestaand gedrag van het skelet). E2E niet gedraaid: Playwright mist Chromium; de stand rood van de e2e-criteria is nog niet waargenomen."
+  - tijd: "2026-10-11T18:48"
+    gebeurtenis: "Advies testagent: e2e-bestanden delen één database; serial mode werkt alleen per bestand. Voorstel workers: 1 in playwright.config.ts (buiten de testmap; besluit van de mens, later)."
+  - tijd: "2026-10-11T18:48"
+    gebeurtenis: "Wacht op mens: Chromium voor Playwright downloaden is een nieuw internetdomein."
 
 verbruik:
   inschatting: "~65 regels, ~4 bestanden, 1 ronde, laag (~4% van het weeklimiet)"
@@ -89,6 +98,9 @@ verbruik:
     - rol: spec-schrijver
       model: opus
       tokens: 32784
+    - rol: testagent
+      model: sonnet
+      tokens: 42331
   totaal: null
   limietstops: 0
 

@@ -5,16 +5,15 @@ slice: "A"
 gedrag: "De gebruiker voegt een todo met een titel toe, ziet hem onderaan de lijst en ziet een melding als laden of toevoegen mislukt; de API weigert een te grote body."
 profielversie: 1
 branch: "factory/001-todo-app-a"
-bijgewerkt: "2026-10-11T19:19"
+bijgewerkt: "2026-10-11T19:20"
 
-fase: bouwen
+fase: review
 ronde: 2
 testconflicten: 0
 wacht_op_mens: null
 
-volgende_stap: "bouwer ronde 2: blokkerende bevinding B-1 oplossen (lange titel zonder spaties op 375 px), adviezen B-2 t/m B-4 meenemen of gemotiveerd afwijzen"
+volgende_stap: "review ronde 2 door security, ui en ux op 158cdf7"
 resterend_werk:
-  - "bouwen ronde 2 (bouwer)"
   - "review ronde 2 (security, ui, ux)"
   - "opleverpakket"
 
@@ -114,6 +113,11 @@ bevindingen:
 beslissingen:
   - "Tijdens het laden toont de lijst niets (ook niet \"Nog niets te doen.\"), zodat bij een mislukte GET alleen \"Laden mislukt\" staat (AC-10). Afgeleid uit de diff, niet uit een resultaatblok."
   - "Body-limiet als uitzondering in leesJson, afgevangen in behandelApi: status 413 met connection: close. Afgeleid uit de diff."
+  - "B-1 (ronde 2): li label flex 1 en min-width 0, titel overflow-wrap anywhere, knop flex-shrink 0, zodat lange titels afbreken en de knop zichtbaar blijft."
+  - "B-2 (ronde 2): knoppen min-width en min-height 44 px, checkbox 1.5rem, li label min-height 44 px."
+  - "B-3 (ronde 2): tijdens laden 'Laden…' met role status, alleen zolang er geen fout is; bij een mislukte GET staat alleen de alert (AC-10)."
+  - "B-4 (ronde 2): grijs #777 vervangen door #666."
+  - "B-5 is een notitie en niet opgelost."
 
 verloop:
   - tijd: "2026-10-11T18:45"
@@ -140,6 +144,10 @@ verloop:
     gebeurtenis: "Review ronde 1: security geen bevindingen (eigen probe tot 50 MB, ook chunked: steeds 413); ui 1 blokkerend (B-1) en 3 adviezen (B-2 t/m B-4); ux 1 notitie (B-5). Werkmap en HEAD onveranderd na de review."
   - tijd: "2026-10-11T19:19"
     gebeurtenis: "Open blokkerende bevinding en ronde 1 < 3: ronde 2, terug naar de bouwer."
+  - tijd: "2026-10-11T19:20"
+    gebeurtenis: "Bouwer ronde 2: commit 158cdf7 (src/app/app.css, src/app/app.html); B-1 opgelost volgens de bouwer, adviezen B-2 t/m B-4 overgenomen."
+  - tijd: "2026-10-11T19:20"
+    gebeurtenis: "Zelf gecontroleerd: test-ratchet in orde; build, test (13), lint, format:check en e2e (9) groen. Omvang 62 regels erbij, 10 eraf, 5 bestanden: onder de alarmgrens."
 
 verbruik:
   inschatting: "~65 regels, ~4 bestanden, 1 ronde, laag (~4% van het weeklimiet)"
@@ -165,6 +173,9 @@ verbruik:
     - rol: ux
       model: sonnet
       tokens: 25060
+    - rol: bouwer
+      model: sonnet
+      tokens: 19320
   totaal: null
   limietstops: 0
 

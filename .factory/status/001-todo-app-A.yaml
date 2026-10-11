@@ -5,16 +5,17 @@ slice: "A"
 gedrag: "De gebruiker voegt een todo met een titel toe, ziet hem onderaan de lijst en ziet een melding als laden of toevoegen mislukt; de API weigert een te grote body."
 profielversie: 1
 branch: "factory/001-todo-app-a"
-bijgewerkt: "2026-10-11T19:17"
+bijgewerkt: "2026-10-11T19:19"
 
-fase: review
-ronde: 1
+fase: bouwen
+ronde: 2
 testconflicten: 0
 wacht_op_mens: null
 
-volgende_stap: "review ronde 1 door security, ui en ux op 1dc12c1"
+volgende_stap: "bouwer ronde 2: blokkerende bevinding B-1 oplossen (lange titel zonder spaties op 375 px), adviezen B-2 t/m B-4 meenemen of gemotiveerd afwijzen"
 resterend_werk:
-  - "review (security, ui, ux)"
+  - "bouwen ronde 2 (bouwer)"
+  - "review ronde 2 (security, ui, ux)"
   - "opleverpakket"
 
 tests:
@@ -68,7 +69,47 @@ dekking:
     test: "tests/factory/server/slice-a.test.ts::AC-44: een body van 10 240 bytes mag, 10 241 bytes en 20 000 bytes chunked geven 413 en veranderen niets"
     status: groen
 
-bevindingen: []
+bevindingen:
+  - id: B-1
+    specialist: ui
+    niveau: blokkerend
+    ronde: 1
+    wat: "Een lange titel zonder spaties (200 tekens, geldige invoer volgens AC-14) laat de pagina op 375 px horizontaal scrollen (scrollWidth 2363 px) en duwt de knop Verwijderen buiten beeld."
+    waar: "src/app/app.css:44"
+    status: open
+    oplossing: ""
+  - id: B-2
+    specialist: ui
+    niveau: advies
+    ronde: 1
+    wat: "Aanraakdoelen kleiner dan 44 bij 44 px (verwijderknop 41x39, Toevoegen 106x38)."
+    waar: "src/app/app.css:15, src/app/app.html:31-37"
+    status: open
+    oplossing: ""
+  - id: B-3
+    specialist: ui
+    niveau: advies
+    ronde: 1
+    wat: "Tijdens het laden is niets te zien; voorstel: <p role=\"status\">Laden…</p> zolang niet geladen en geen fout."
+    waar: "src/app/app.html:21-22"
+    status: open
+    oplossing: ""
+  - id: B-4
+    specialist: ui
+    niveau: advies
+    ronde: 1
+    wat: "Contrast #777 op #fafafa ongeveer 4,3:1 (berekend), onder WCAG 4,5:1, voor 'Nog niets te doen.' en afgevinkte titels."
+    waar: "src/app/app.css:50-56"
+    status: open
+    oplossing: ""
+  - id: B-5
+    specialist: ux
+    niveau: notitie
+    ronde: 1
+    wat: "Mislukt het herladen na een geslaagde toevoeging, dan staat de todo wel op de server maar ziet de gebruiker 'Laden mislukt' en de todo niet; herladen herstelt het."
+    waar: "src/app/app.ts:37-41"
+    status: open
+    oplossing: ""
 
 beslissingen:
   - "Tijdens het laden toont de lijst niets (ook niet \"Nog niets te doen.\"), zodat bij een mislukte GET alleen \"Laden mislukt\" staat (AC-10). Afgeleid uit de diff, niet uit een resultaatblok."
@@ -95,6 +136,10 @@ verloop:
     gebeurtenis: "Bouwer ronde 1: commit 1dc12c1 (server/api.ts, src/app/app.html, src/app/app.ts, src/app/todo.service.ts). Het resultaatblok ontbrak (alleen 'placeholder'); toestand zelf gecontroleerd."
   - tijd: "2026-10-11T19:17"
     gebeurtenis: "Zelf gecontroleerd: test-ratchet in orde (gelijk aan 081d84e); build, test (13 server/unit-tests), lint, format:check en e2e (9 tests) groen. Omvang 42 regels erbij, 8 eraf, 4 bestanden: onder de alarmgrens."
+  - tijd: "2026-10-11T19:19"
+    gebeurtenis: "Review ronde 1: security geen bevindingen (eigen probe tot 50 MB, ook chunked: steeds 413); ui 1 blokkerend (B-1) en 3 adviezen (B-2 t/m B-4); ux 1 notitie (B-5). Werkmap en HEAD onveranderd na de review."
+  - tijd: "2026-10-11T19:19"
+    gebeurtenis: "Open blokkerende bevinding en ronde 1 < 3: ronde 2, terug naar de bouwer."
 
 verbruik:
   inschatting: "~65 regels, ~4 bestanden, 1 ronde, laag (~4% van het weeklimiet)"
@@ -111,6 +156,15 @@ verbruik:
     - rol: bouwer
       model: sonnet
       tokens: 30048
+    - rol: security
+      model: opus
+      tokens: 43423
+    - rol: ui
+      model: sonnet
+      tokens: 21703
+    - rol: ux
+      model: sonnet
+      tokens: 25060
   totaal: null
   limietstops: 0
 

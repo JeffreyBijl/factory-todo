@@ -7,14 +7,13 @@ profielversie: 1
 branch: "factory/001-todo-app-a"
 bijgewerkt: "2026-10-11T20:09"
 
-fase: opleverpakket
+fase: klaar
 ronde: 2
 testconflicten: 0
 wacht_op_mens: null
 
-volgende_stap: "PR-tekst schrijven naar /tmp/factory-pr-001-todo-app-A.md, fase klaar, mens vragen om push en PR"
-resterend_werk:
-  - "opleverpakket"
+volgende_stap: "mens beslist over push en PR (gh pr create --base main --head factory/001-todo-app-a, body /tmp/factory-pr-001-todo-app-A.md); daarna poort 3 (merge door de mens) en slice B"
+resterend_werk: []
 
 tests:
   commit: "081d84e"
@@ -151,6 +150,8 @@ verloop:
     gebeurtenis: "Review ronde 2: security, ui en ux geen nieuwe bevindingen; B-1 t/m B-4 niet opnieuw gemeld en daarmee opgelost; B-5 (notitie) blijft open. Werkmap en HEAD onveranderd na de review. B-1 zelf nagemeten op 375 px (scrollWidth 375)."
   - tijd: "2026-10-11T20:09"
     gebeurtenis: "Geen open blokkerende bevindingen: fase opleverpakket."
+  - tijd: "2026-10-11T20:09"
+    gebeurtenis: "Opleverpakket geschreven naar /tmp/factory-pr-001-todo-app-A.md, advies 'Let op' (2 rondes i.p.v. 1, gevoelig gebied server/** geraakt, open notitie B-5). Fase klaar."
 
 verbruik:
   inschatting: "~65 regels, ~4 bestanden, 1 ronde, laag (~4% van het weeklimiet)"

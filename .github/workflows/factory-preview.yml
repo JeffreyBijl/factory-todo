@@ -1,0 +1,157 @@
+# Preview per PR van de software factory, op Render (gratis plan).
+#
+# Staat in het project als .github/workflows/factory-preview.yml (verboden terrein, CODEOWNERS).
+# Bij openen of bijwerken van een PR: een Render-service <repo>-pr-<n> die het Dockerfile van de
+# PR-branch bouwt, met de link als deployment en commentaar in de PR. Bij sluiten: weg.
+#
+# Veiligheid: pull_request_target draait altijd de versie van deze workflow uit de basisbranch,
+# dus een agent kan hem op zijn branch niet aanpassen om bij het token te komen. De workflow checkt
+# de code van de PR nooit uit: Render bouwt die zelf. Naam en instellingen staan hier vast.
+# PR's uit een fork krijgen geen preview.
+#
+# Nodig in de Environment "preview": het secret RENDER_API_KEY, van een Render-account dat
+# alleen voor previews is (de sleutel geeft toegang tot het hele account).
+
+name: factory-preview
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, closed]
+
+permissions:
+  contents: read
+  deployments: write
+  pull-requests: write
+
+concurrency:
+  group: factory-preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+env:
+  RENDER_API: https://api.render.com/v1
+  NAAM: ${{ github.event.repository.name }}-pr-${{ github.event.pull_request.number }}
+  REPO: ${{ github.repository }}
+  PR: ${{ github.event.pull_request.number }}
+  SHA: ${{ github.event.pull_request.head.sha }}
+  BRANCH: ${{ github.event.pull_request.head.ref }}
+  GH_TOKEN: ${{ github.token }}
+
+jobs:
+  preview:
+    if: >-
+      github.event.action != 'closed' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    environment: preview
+    steps:
+      - name: Dockerfile aanwezig?
+        id: docker
+        run: |
+          if gh api "repos/$REPO/contents/Dockerfile?ref=$SHA" --silent 2>/dev/null; then
+            echo "aanwezig=ja" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::Geen Dockerfile op deze branch: geen preview."
+            echo "aanwezig=nee" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Preview neerzetten
+        if: steps.docker.outputs.aanwezig == 'ja'
+        id: render
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+        run: |
+          render() { curl -sSf -H "Authorization: Bearer $RENDER_API_KEY" -H "Accept: application/json" -H "Content-Type: application/json" "$@"; }
+          [ -n "$RENDER_API_KEY" ] || { echo "::error::Secret RENDER_API_KEY ontbreekt in de Environment preview."; exit 1; }
+
+          eigenaar=$(render "$RENDER_API/owners?limit=1" | jq -r '.[0].owner.id')
+          dienst=$(render "$RENDER_API/services?name=$NAAM&ownerId=$eigenaar" | jq -r '.[0].service.id // empty')
+
+          if [ -z "$dienst" ]; then
+            body=$(jq -n --arg naam "$NAAM" --arg eigenaar "$eigenaar" --arg repo "https://github.com/$REPO" --arg branch "$BRANCH" '{
+              type: "web_service", name: $naam, ownerId: $eigenaar, repo: $repo, branch: $branch,
+              autoDeployTrigger: "off",
+              serviceDetails: {
+                runtime: "docker", plan: "free", region: "frankfurt",
+                envSpecificDetails: { dockerfilePath: "./Dockerfile", dockerContext: "." }
+              }
+            }')
+            # Aanmaken start meteen een deploy van de laatste commit op de branch.
+            dienst=$(render -X POST "$RENDER_API/services" -d "$body" | jq -r '.service.id')
+            echo "Service $NAAM aangemaakt ($dienst)."
+          else
+            # 201 met de deploy, of 202 zonder inhoud als er al een deploy loopt; daarom hieronder opzoeken.
+            render -X POST "$RENDER_API/services/$dienst/deploys" -d "$(jq -n --arg sha "$SHA" '{commitId: $sha}')" -o /dev/null
+          fi
+          echo "Deploy van ${SHA:0:7} op $dienst."
+
+          status=""
+          for _ in $(seq 1 120); do
+            status=$(render "$RENDER_API/services/$dienst/deploys?limit=20" |
+              jq -r --arg sha "$SHA" '[.[].deploy | select(.commit.id == $sha)][0].status // "wacht"')
+            case "$status" in
+              live) break ;;
+              build_failed|update_failed|canceled|pre_deploy_failed|deactivated)
+                echo "::error::Deploy van de preview mislukt: $status. Zie het Render-dashboard."; exit 1 ;;
+            esac
+            sleep 10
+          done
+          [ "$status" = "live" ] || { echo "::error::Preview niet live binnen 20 minuten."; exit 1; }
+          url=$(render "$RENDER_API/services/$dienst" | jq -r '.serviceDetails.url')
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+          echo "Preview: $url"
+
+      - name: Link in de PR
+        if: steps.docker.outputs.aanwezig == 'ja'
+        env:
+          URL: ${{ steps.render.outputs.url }}
+        run: |
+          # Eén deployment per commit; task koppelt ze aan de PR, zodat opruimen ze allemaal vindt.
+          id=$(jq -n --arg sha "$SHA" --arg task "preview-pr-$PR" \
+            '{ref: $sha, task: $task, environment: "preview", auto_merge: false, transient_environment: true, required_contexts: []}' |
+            gh api -X POST "repos/$REPO/deployments" --input - --jq .id)
+          gh api -X POST "repos/$REPO/deployments/$id/statuses" \
+            -f state=success -f environment_url="$URL" -F auto_inactive=true --silent
+
+          tekst="<!-- factory-preview -->
+          **Preview:** $URL
+
+          Commit \`${SHA:0:7}\`. Een preview die 15 minuten niet bekeken is, slaapt; de eerste keer openen duurt dan ongeveer een minuut. Bij sluiten of mergen van de PR wordt hij opgeruimd."
+          bestaand=$(gh api "repos/$REPO/issues/$PR/comments" --paginate --jq '.[] | select(.body | startswith("<!-- factory-preview -->")) | .id' | head -n 1)
+          if [ -n "$bestaand" ]; then
+            gh api -X PATCH "repos/$REPO/issues/comments/$bestaand" -f body="$tekst" --silent
+          else
+            gh api -X POST "repos/$REPO/issues/$PR/comments" -f body="$tekst" --silent
+          fi
+
+  opruimen:
+    if: >-
+      github.event.action == 'closed' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: preview
+    steps:
+      - name: Preview opruimen
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+        run: |
+          render() { curl -sSf -H "Authorization: Bearer $RENDER_API_KEY" -H "Accept: application/json" "$@"; }
+          eigenaar=$(render "$RENDER_API/owners?limit=1" | jq -r '.[0].owner.id')
+          dienst=$(render "$RENDER_API/services?name=$NAAM&ownerId=$eigenaar" | jq -r '.[0].service.id // empty')
+          if [ -n "$dienst" ]; then
+            render -X DELETE "$RENDER_API/services/$dienst" -o /dev/null
+            echo "Service $NAAM verwijderd."
+          else
+            echo "Geen service $NAAM: niets op te ruimen."
+          fi
+
+          for id in $(gh api "repos/$REPO/deployments?environment=preview&task=preview-pr-$PR" --paginate --jq '.[].id'); do
+            gh api -X POST "repos/$REPO/deployments/$id/statuses" -f state=inactive --silent || true
+          done
+          bestaand=$(gh api "repos/$REPO/issues/$PR/comments" --paginate --jq '.[] | select(.body | startswith("<!-- factory-preview -->")) | .id' | head -n 1)
+          if [ -n "$bestaand" ]; then
+            gh api -X PATCH "repos/$REPO/issues/comments/$bestaand" \
+              -f body="<!-- factory-preview -->
+          **Preview:** opgeruimd bij het sluiten van de PR." --silent
+          fi

@@ -1,0 +1,10 @@
+# CODEOWNERS van de software factory: wat hier staat, verandert alleen met goedkeuring van de mens.
+# Staat in het project als .github/CODEOWNERS; het setupscript vult JeffreyBijl en tests/factory/ in.
+# De rulesets eisen een review van de code owner, dus ook de factory kan hier niet omheen.
+
+/.github/                @JeffreyBijl
+/.devcontainer/          @JeffreyBijl
+/.factory/profiel.yaml   @JeffreyBijl
+/.factory/specs/         @JeffreyBijl
+/CLAUDE.md               @JeffreyBijl
+/tests/factory/               @JeffreyBijl

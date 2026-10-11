@@ -1,0 +1,222 @@
+# Checks van de software factory: verplicht vóór elke merge naar main en dev.
+#
+# Staat in het project als .github/workflows/factory-checks.yml (verboden terrein, CODEOWNERS).
+# De commando's komen uit .factory/profiel.yaml, dus dit bestand is gelijk voor elke stack.
+# Alleen de stap "Stack" hangt van de stack af; standaard Node.
+#
+# De jobnamen zijn de required checks in de rulesets: build, tests, lint, formattering,
+# e2e, test-ratchet, secret-scan en dependency-review. Wijzig je een naam, pas dan ook de ruleset aan.
+# Geen secrets in deze workflow: een PR van de factory draait hier alleen met leesrechten.
+
+name: factory-checks
+
+on:
+  pull_request:
+  push:
+    branches: [main, dev]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: factory-checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  profiel:
+    name: ${{ matrix.check }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - check: build
+            commando: bouwen
+          - check: tests
+            commando: testen
+          - check: lint
+            commando: linten
+          - check: formattering
+            commando: formattering_controleren
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # --- Stack: pas aan bij een andere stack (bijv. actions/setup-python of actions/setup-go) ---
+      - name: Stack
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+      # --- Einde stack ---
+
+      - name: Installeren
+        run: |
+          commando=$(node .github/factory/profiel-commando.mjs installeren)
+          if [ -n "$commando" ]; then bash -c "$commando"; fi
+
+      - name: ${{ matrix.check }}
+        env:
+          SLEUTEL: ${{ matrix.commando }}
+        run: |
+          commando=$(node .github/factory/profiel-commando.mjs "$SLEUTEL")
+          if [ -z "$commando" ]; then
+            echo "::error::Het profiel heeft geen commando voor $SLEUTEL."
+            exit 1
+          fi
+          echo "$commando"
+          bash -c "$commando"
+
+  # E2E-tests tegen de preview van deze commit (workflow factory-preview). Zonder Dockerfile, of
+  # zonder preview-workflow, draaien ze lokaal op de runner; zonder E2E-commando slaagt de job.
+  e2e:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    permissions:
+      contents: read
+      deployments: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: E2E-commando
+        id: commando
+        run: |
+          commando=$(node .github/factory/profiel-commando.mjs e2e)
+          echo "commando=$commando" >> "$GITHUB_OUTPUT"
+          [ -n "$commando" ] || echo "::notice::Geen E2E-commando in het profiel: niets te testen."
+
+      - name: Wachten op de preview
+        if: steps.commando.outputs.commando != ''
+        id: preview
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+          VAN_FORK: ${{ github.event.pull_request.head.repo.full_name != github.repository }}
+          BASIS: ${{ github.event.pull_request.base.ref }}
+        run: |
+          # De preview draait via pull_request_target, dus alleen als de workflow al op de basisbranch staat
+          # (niet in de PR die hem toevoegt).
+          if ! gh api "repos/$REPO/contents/.github/workflows/factory-preview.yml?ref=$BASIS" --silent 2>/dev/null; then
+            preview_op_basis=false
+          fi
+          if [ ! -f Dockerfile ] || [ "${preview_op_basis:-true}" = "false" ] || [ "$VAN_FORK" = "true" ]; then
+            echo "::notice::Geen preview voor deze PR: E2E-tests draaien lokaal."
+            exit 0
+          fi
+          for _ in $(seq 1 150); do
+            id=$(gh api "repos/$REPO/deployments?environment=preview&sha=$SHA" --jq '.[0].id // empty')
+            if [ -n "$id" ]; then
+              url=$(gh api "repos/$REPO/deployments/$id/statuses" --jq '[.[] | select(.state == "success")][0].environment_url // empty')
+              if [ -n "$url" ]; then
+                echo "url=$url" >> "$GITHUB_OUTPUT"
+                echo "Preview: $url"
+                # Een slapende preview wordt wakker van het eerste verzoek; dat duurt ongeveer een minuut.
+                for _ in $(seq 1 30); do
+                  curl -sf -o /dev/null --max-time 20 "$url" && exit 0
+                  sleep 5
+                done
+                echo "::error::De preview antwoordt niet: $url"
+                exit 1
+              fi
+            fi
+            sleep 10
+          done
+          echo "::error::Geen preview voor ${SHA:0:7} binnen 25 minuten; zie de workflow factory-preview."
+          exit 1
+
+      # --- Stack: pas aan bij een andere stack ---
+      - name: Stack
+        if: steps.commando.outputs.commando != ''
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+      - name: Installeren
+        if: steps.commando.outputs.commando != ''
+        run: |
+          commando=$(node .github/factory/profiel-commando.mjs installeren)
+          if [ -n "$commando" ]; then bash -c "$commando"; fi
+          npx playwright install --with-deps chromium
+      # --- Einde stack ---
+
+      - name: E2E-tests
+        if: steps.commando.outputs.commando != ''
+        env:
+          BASE_URL: ${{ steps.preview.outputs.url }}
+          COMMANDO: ${{ steps.commando.outputs.commando }}
+        run: |
+          if [ -n "$BASE_URL" ]; then echo "Tegen de preview: $BASE_URL"; else unset BASE_URL; fi
+          bash -c "$COMMANDO"
+
+  test-ratchet:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Test-ratchet
+        env:
+          BASIS: origin/${{ github.base_ref }}
+          BRANCH: ${{ github.head_ref }}
+        run: node .github/factory/test-ratchet.mjs pipeline --basisbranch "$BASIS" --branch "$BRANCH"
+
+  secret-scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GITLEAKS_VERSION: 8.30.1
+      GITLEAKS_SHA256: 551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Gitleaks installeren
+        run: |
+          tar="gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          curl -sSfLO "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/${tar}"
+          echo "${GITLEAKS_SHA256}  ${tar}" | sha256sum -c -
+          tar -xzf "$tar" -C "$RUNNER_TEMP" gitleaks
+      # Dezelfde config als de pre-push hook in de devcontainer. Een .gitleaks.toml of
+      # .gitleaksignore in de repo telt niet: wat mag, beslist de mens in .devcontainer/.
+      - name: Secret-scan
+        env:
+          PR_BASIS: ${{ github.event.pull_request.base.sha }}
+          PR_KOP: ${{ github.event.pull_request.head.sha }}
+          VOOR: ${{ github.event.before }}
+          NA: ${{ github.sha }}
+        run: |
+          if [ -n "$PR_BASIS" ]; then
+            bereik="$PR_BASIS..$PR_KOP"
+          elif [ -n "$VOOR" ] && ! [[ "$VOOR" =~ ^0+$ ]]; then
+            bereik="$VOOR..$NA"
+          else
+            bereik="$NA"
+          fi
+          echo "Commits: $bereik"
+          cp .devcontainer/gitleaks.toml "$RUNNER_TEMP/gitleaks.toml"
+          rm -f .gitleaksignore
+          "$RUNNER_TEMP/gitleaks" git --config "$RUNNER_TEMP/gitleaks.toml" \
+            --log-opts="$bereik" --redact --verbose --no-banner --exit-code 1
+          # De inline allow-markering zou een vondst stil wegzetten; dat beslist alleen de mens.
+          if git log -p "$bereik" | grep -qE '^\+.*gitleaks[:]allow'; then
+            echo "::error::Allow-markering van gitleaks toegevoegd."
+            exit 1
+          fi
+
+  dependency-review:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Dependency review
+        uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+        with:
+          fail-on-severity: moderate

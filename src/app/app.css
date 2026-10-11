@@ -19,6 +19,9 @@ button {
 	padding: 0.5rem 0.75rem;
 	font-size: 1rem;
 	cursor: pointer;
+	min-width: 44px;
+	min-height: 44px;
+	flex-shrink: 0;
 }
 
 ul {
@@ -39,11 +42,24 @@ li label {
 	gap: 0.5rem;
 	align-items: center;
 	cursor: pointer;
+	flex: 1;
+	min-width: 0;
+	min-height: 44px;
+}
+
+li label span {
+	overflow-wrap: anywhere;
+}
+
+li label input {
+	width: 1.5rem;
+	height: 1.5rem;
+	flex-shrink: 0;
 }
 
 li.gedaan span {
 	text-decoration: line-through;
-	color: #777;
+	color: #666;
 }
 
 .fout {
@@ -51,7 +67,7 @@ li.gedaan span {
 }
 
 .leeg {
-	color: #777;
+	color: #666;
 }
 
 .verborgen {

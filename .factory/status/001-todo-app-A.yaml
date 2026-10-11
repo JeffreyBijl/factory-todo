@@ -5,19 +5,15 @@ slice: "A"
 gedrag: "De gebruiker voegt een todo met een titel toe, ziet hem onderaan de lijst en ziet een melding als laden of toevoegen mislukt; de API weigert een te grote body."
 profielversie: 1
 branch: "factory/001-todo-app-a"
-bijgewerkt: "2026-10-11T18:49"
+bijgewerkt: "2026-10-11T19:16"
 
-fase: wacht-op-mens
-ronde: 0
+fase: bouwen
+ronde: 1
 testconflicten: 0
-wacht_op_mens:
-  reden: "geblokkeerd"
-  sinds: "2026-10-11T18:48"
-  vraag: "Chromium-download geblokkeerd door de firewall: cdn.playwright.dev toevoegen aan .devcontainer/allowlist.txt (verboden terrein, alleen de mens), of Chromium zelf installeren, of zonder lokale e2e verder?"
+wacht_op_mens: null
 
-volgende_stap: "na besluit over de Playwright-browser: e2e-tests van slice A draaien en controleren dat ze rood zijn om ontbrekend gedrag; dan fase bouwen, ronde 1, bouwer starten"
+volgende_stap: "bouwer bouwt slice A, ronde 1 (rood: AC-8, AC-9, AC-10, AC-44)"
 resterend_werk:
-  - "e2e-tests controleren op rood om de juiste reden"
   - "bouwen (bouwer)"
   - "review (security, ui, ux)"
   - "opleverpakket"
@@ -29,22 +25,22 @@ tests:
 dekking:
   - criterium: AC-1
     test: "tests/factory/e2e/slice-a.spec.ts::AC-1: een lege lijst toont \"Nog niets te doen.\" en geen listitem"
-    status: rood
+    status: groen
   - criterium: AC-2
     test: "tests/factory/e2e/slice-a.spec.ts::AC-2: Melk kopen toevoegen met Enter toont één listitem, leegt het veld en verbergt de lege tekst"
-    status: rood
+    status: groen
   - criterium: AC-3
     test: "tests/factory/e2e/slice-a.spec.ts::AC-3: toevoegen met de knop zet nieuwe todos onderaan"
-    status: rood
+    status: groen
   - criterium: AC-4
     test: "tests/factory/e2e/slice-a.spec.ts::AC-4: na herladen staan Melk kopen en Brood er nog, in dezelfde volgorde"
-    status: rood
+    status: groen
   - criterium: AC-5
     test: "tests/factory/e2e/slice-a.spec.ts::AC-5: drie spaties toevoegen geeft geen listitem, ook niet na herladen"
-    status: rood
+    status: groen
   - criterium: AC-6
     test: "tests/factory/e2e/slice-a.spec.ts::AC-6: <b>vet</b> wordt letterlijk getoond en niet als b-element"
-    status: rood
+    status: groen
   - criterium: AC-7
     test: "tests/factory/unit/slice-a.spec.ts::AC-7: het invoerveld \"Nieuwe taak\" heeft maxlength=\"200\""
     status: groen
@@ -90,6 +86,10 @@ verloop:
     gebeurtenis: "Wacht op mens: Chromium voor Playwright downloaden is een nieuw internetdomein."
   - tijd: "2026-10-11T18:49"
     gebeurtenis: "Mens geeft akkoord op npx playwright install chromium; download faalt: de firewall blokkeert cdn.playwright.dev. Het domein staat niet in .devcontainer/allowlist.txt (verboden terrein)."
+  - tijd: "2026-10-11T19:16"
+    gebeurtenis: "Mens heeft Chromium en PyYAML in de devcontainer-image opgenomen. E2E gedraaid: AC-1 t/m AC-6 groen (bestaand gedrag); AC-8 en AC-9 rood om ontbrekend gedrag (alert toont een JSON-parsefout i.p.v. 'Toevoegen mislukt'); AC-10 rood om ontbrekend gedrag (geen alert 'Laden mislukt'). AC-9 en AC-10 apart gedraaid, omdat serial mode na AC-8 stopt."
+  - tijd: "2026-10-11T19:16"
+    gebeurtenis: "Fase bouwen, ronde 1."
 
 verbruik:
   inschatting: "~65 regels, ~4 bestanden, 1 ronde, laag (~4% van het weeklimiet)"

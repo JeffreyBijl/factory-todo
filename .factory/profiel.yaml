@@ -1,0 +1,93 @@
+# Projectprofiel van de software factory
+#
+# Zonder goedgekeurd profiel bouwt de factory niets.
+# De factory stelt wijzigingen voor; alleen de mens keurt ze goed en verhoogt de versie.
+
+schema: 1
+versie: 1
+goedgekeurd:
+  door: "Jeffrey Bijl"
+  op: "2026-10-11"
+project:
+  naam: "factory-todo"
+  repo: "JeffreyBijl/factory-todo"
+  omschrijving: "Todo-lijst in de browser (toevoegen, afvinken, verwijderen) voor persoonlijk gebruik"
+
+# --- Verplicht vóór bouwen ---
+
+commandos:
+  installeren: "npm ci"
+  bouwen: "npm run build"
+  testen: "npm test"
+  e2e: "npm run e2e"
+  linten: "npm run lint"
+  formatteren: "npm run format"
+  formattering_controleren: "npm run format:check"
+  lokaal_draaien: "npm run build && npm start"
+  gecontroleerd_op: "2026-10-11"
+
+stack:
+  taal: "TypeScript 6.0 op Node 24 (devcontainer: Node 22, minimaal 22.18)"
+  framework: "Angular 22 (zoneless, geen SSR) met een Node-server op node:http"
+  database: "SQLite via node:sqlite (ingebouwd), pad via DB_PATH"
+  testtools:
+    unit: "Vitest (Angular via ng test, server via vitest run)"
+    e2e: "Playwright"
+  formatter: "Prettier met tabs"
+
+# Map met de tests van de testagent; valt onder de test-ratchet en CODEOWNERS.
+# unit/ (Angular, *.spec.ts), server/ (API, *.test.ts), e2e/ (Playwright, *.spec.ts)
+testmap: "tests/factory/"
+
+# Paden die geen enkele agent wijzigt. Aanvullen mag, schrappen niet.
+verboden_terrein:
+  - .github/
+  - .devcontainer/
+  - .factory/profiel.yaml
+  - CLAUDE.md
+  - Dockerfile
+  - .dockerignore
+
+# Delen waar security altijd meekijkt en die bovenaan in de PR komen.
+gevoelige_gebieden:
+  - pad: "server/**"
+    reden: "publieke API zonder authenticatie of rate limiting, en bestandsserving uit dist/"
+  - pad: "server/db.ts"
+    reden: "databaseschema en queries (SQLite)"
+  - pad: "proxy.conf.json"
+    reden: "bepaalt waar de frontend zijn API-verzoeken heen stuurt"
+  - pad: "package.json"
+    reden: "dependencies en scripts die in CI en de preview draaien"
+
+grenzen:
+  max_rondes: 3
+  max_rondes_zonder_voortgang: 2
+  max_testconflicten: 3
+  pr_alarm:
+    regels: 400
+    bestanden: 15
+  verbruik_alarm: "30% van het weeklimiet per slice"
+
+# Security is altijd verplicht.
+specialisten:
+  verplicht: [security, ui, ux]
+  optioneel: [backend, database, evaluator]
+
+# --- Groeit mee ---
+
+conventies: []
+
+model_per_rol:
+  spec-schrijver: { model: opus, effort: high }
+  security: { model: opus, effort: high }
+  testagent: { model: sonnet, effort: medium }
+  bouwer: { model: sonnet, effort: medium }
+  eenvoudige-checks: { model: haiku, effort: low }
+
+# Alleen namen, nooit waarden.
+omgevingen: {}
+
+wijzigingen:
+  - versie: 1
+    op: "2026-10-11"
+    wat: "Eerste profiel na de kennismaking"

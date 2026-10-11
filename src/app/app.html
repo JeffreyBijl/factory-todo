@@ -1,0 +1,42 @@
+<main>
+	<h1>Todo</h1>
+
+	<form (ngSubmit)="voegToe()">
+		<label for="nieuw" class="verborgen">Nieuwe taak</label>
+		<input
+			id="nieuw"
+			name="titel"
+			[(ngModel)]="nieuweTitel"
+			placeholder="Wat moet er gebeuren?"
+			maxlength="200"
+			autocomplete="off"
+		/>
+		<button type="submit">Toevoegen</button>
+	</form>
+
+	@if (fout()) {
+		<p class="fout" role="alert">{{ fout() }}</p>
+	}
+
+	@if (todos().length === 0) {
+		<p class="leeg">Nog niets te doen.</p>
+	} @else {
+		<ul>
+			@for (todo of todos(); track todo.id) {
+				<li [class.gedaan]="todo.gedaan">
+					<label>
+						<input type="checkbox" [checked]="todo.gedaan" (change)="wissel(todo)" />
+						<span>{{ todo.titel }}</span>
+					</label>
+					<button
+						type="button"
+						(click)="verwijder(todo)"
+						[attr.aria-label]="'Verwijder ' + todo.titel"
+					>
+						✕
+					</button>
+				</li>
+			}
+		</ul>
+	}
+</main>

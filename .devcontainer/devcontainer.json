@@ -1,0 +1,64 @@
+{
+  // Gebaseerd op de referentie-devcontainer van Claude Code:
+  // https://github.com/anthropics/claude-code/tree/d945a61bc6346abce607252d5667df8a3bf0461a/.devcontainer
+  "name": "Software Factory",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "args": {
+      "TZ": "${localEnv:TZ:Europe/Amsterdam}",
+      "CLAUDE_CODE_VERSION": "2.1.296",
+      "GIT_DELTA_VERSION": "0.18.2",
+      "ZSH_IN_DOCKER_VERSION": "1.2.0",
+      "GITLEAKS_VERSION": "8.30.1"
+    }
+  },
+  "runArgs": [
+    "--cap-add=NET_ADMIN",
+    "--cap-add=NET_RAW"
+  ],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "anthropic.claude-code",
+        "eamodio.gitlens"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "zsh",
+        "terminal.integrated.profiles.linux": {
+          "bash": {
+            "path": "bash",
+            "icon": "terminal-bash"
+          },
+          "zsh": {
+            "path": "zsh"
+          }
+        }
+      }
+    }
+  },
+  "remoteUser": "node",
+  "mounts": [
+    "source=factory-bashhistory-${devcontainerId},target=/commandhistory,type=volume",
+    "source=factory-claude-config-${devcontainerId},target=/home/node/.claude,type=volume",
+    // De plugin van de factory, alleen-lezen: geen agent kan de factory-instructies aanpassen.
+    // start-devcontainer.sh zet FACTORY_PLUGIN_DIR (standaard ~/development/software-factory/plugin).
+    "source=${localEnv:FACTORY_PLUGIN_DIR},target=/opt/software-factory,type=bind,readonly"
+  ],
+  "containerEnv": {
+    "NODE_OPTIONS": "--max-old-space-size=4096",
+    "CLAUDE_CONFIG_DIR": "/home/node/.claude",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+    "DISABLE_AUTOUPDATER": "1",
+    "POWERLEVEL9K_DISABLE_GITSTATUS": "true"
+  },
+  // Het factory-token komt uit de Keychain van de host via start-devcontainer.sh;
+  // er wordt nergens een bestand met de waarde geschreven.
+  "remoteEnv": {
+    "LC_ALL": "C.UTF-8",
+    "GH_TOKEN": "${localEnv:FACTORY_GH_TOKEN}"
+  },
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=delegated",
+  "workspaceFolder": "/workspace",
+  "postStartCommand": "sudo /usr/local/bin/init-firewall.sh",
+  "waitFor": "postStartCommand"
+}

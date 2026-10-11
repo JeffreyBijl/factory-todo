@@ -1,0 +1,17 @@
+# Gitleaks-config van de factory: de standaardregels plus een verbod op
+# .env-bestanden. Staat als root in de image (/etc/factory/gitleaks.toml);
+# een .gitleaks.toml of .gitleaksignore in de repo wordt niet gebruikt.
+
+title = "software-factory"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "env-bestand"
+description = "Geen .env-bestanden: secrets komen uit de secrets manager"
+path = '''(^|/)\.env(\.[^/]*)?$'''
+
+[[rules.allowlists]]
+description = "Voorbeeldbestanden zonder waarden"
+paths = ['''(^|/)\.env\.(example|sample|template)$''']

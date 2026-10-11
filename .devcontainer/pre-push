@@ -1,0 +1,49 @@
+#!/bin/bash
+# Pre-push hook van de factory: scant de commits die gepusht worden met
+# gitleaks en blokkeert de push bij een gevonden secret of .env-bestand.
+# Staat als root in de image en is actief via `git config --system core.hooksPath`.
+set -euo pipefail
+
+remote="$1"
+zero=$(git hash-object --stdin </dev/null | tr '0-9a-f' '0')
+blocked=0
+# stdin bewaren, zodat een eventuele projecthook dezelfde invoer krijgt
+pushed=$(cat)
+
+while read -r local_ref local_sha _remote_ref remote_sha; do
+    # Lege invoer of een branch verwijderen: geen nieuwe commits
+    [ -z "$local_sha" ] || [ "$local_sha" = "$zero" ] && continue
+
+    if [ "$remote_sha" = "$zero" ]; then
+        range="$local_sha --not --remotes=$remote"
+    else
+        range="$remote_sha..$local_sha"
+    fi
+
+    if ! gitleaks git \
+        --config /etc/factory/gitleaks.toml \
+        --gitleaks-ignore-path /etc/factory \
+        --log-opts="$range" \
+        --redact --verbose --no-banner --exit-code 1 </dev/null; then
+        blocked=1
+    fi
+
+    # De inline allow-markering van gitleaks zou een vondst stil wegzetten;
+    # dat beslist alleen de mens. ([:] zodat dit bestand zichzelf niet raakt.)
+    # shellcheck disable=SC2086
+    if git log -p $range | grep -qE '^\+.*gitleaks[:]allow'; then
+        echo "Geblokkeerd: allow-markering van gitleaks toegevoegd in $local_ref" >&2
+        blocked=1
+    fi
+done <<< "$pushed"
+
+if [ "$blocked" -ne 0 ]; then
+    echo "Push geblokkeerd door de secret-scan. Haal het secret uit de commits en trek het in." >&2
+    exit 1
+fi
+
+# Een eigen pre-push hook van het project draait daarna nog gewoon
+project_hook="$(git rev-parse --git-dir)/hooks/pre-push"
+if [ -x "$project_hook" ]; then
+    exec "$project_hook" "$@" <<< "$pushed"
+fi

@@ -1,0 +1,31 @@
+# Firewall-allowlist van de factory-devcontainer.
+#
+# Eén domein per regel; commentaar met #. Elk domein wordt bij het starten van
+# de container naar IPv4-adressen vertaald. De IP-ranges van GitHub komen
+# apart uit api.github.com/meta en staan hier dus niet.
+#
+# Dit bestand wordt bij het bouwen in de image gezet (/etc/factory/allowlist.txt,
+# eigendom van root). Een wijziging werkt pas na een rebuild, en een nieuw
+# domein is een beslissing van de mens.
+
+# --- Claude ---
+# Volgens https://code.claude.com/docs/en/network-config#network-access-requirements
+api.anthropic.com
+claude.ai
+claude.com
+platform.claude.com
+# Documentatie-opzoekingen door Claude zelf
+code.claude.com
+
+# --- Package registries ---
+registry.npmjs.org
+pypi.org
+files.pythonhosted.org
+
+# --- VS Code (extensies in de container) ---
+marketplace.visualstudio.com
+vscode.blob.core.windows.net
+update.code.visualstudio.com
+
+# --- Project ---
+# Extra registries of diensten van dit project, met akkoord van de mens.

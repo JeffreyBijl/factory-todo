@@ -1,0 +1,12 @@
+node_modules
+dist
+.angular
+data
+tests
+test-results
+playwright-report
+.factory
+.devcontainer
+.github
+.git
+.vscode

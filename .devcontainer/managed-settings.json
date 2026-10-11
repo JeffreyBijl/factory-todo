@@ -1,0 +1,20 @@
+{
+  "disableClaudeAiConnectors": true,
+  "permissions": {
+    "deny": [
+      "Bash(git * --no-verify*)",
+      "Bash(git -c core.hooksPath*)",
+      "Bash(git config * core.hooksPath*)",
+      "Bash(git config core.hooksPath*)",
+      "Bash(printenv*)",
+      "Bash(env)",
+      "Bash(*GH_TOKEN*)",
+      "Bash(gh auth token*)",
+      "Bash(sudo *)",
+      "Read(//proc/*/environ)",
+      "Read(//home/node/.claude/.credentials.json)",
+      "Edit(//workspace/.devcontainer/**)",
+      "Edit(//workspace/.github/**)"
+    ]
+  }
+}

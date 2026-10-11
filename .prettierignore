@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.angular/
+data/
+test-results/
+playwright-report/
+package-lock.json
+.factory/
+.devcontainer/
+.github/

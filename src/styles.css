@@ -1,0 +1,7 @@
+/* Globale stijlen */
+body {
+	margin: 0;
+	font-family: system-ui, sans-serif;
+	color: #222;
+	background: #fafafa;
+}

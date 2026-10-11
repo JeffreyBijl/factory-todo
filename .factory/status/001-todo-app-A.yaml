@@ -1,0 +1,97 @@
+schema: 1
+spec: "001-todo-app"
+spec_versie: 1
+slice: "A"
+gedrag: "De gebruiker voegt een todo met een titel toe, ziet hem onderaan de lijst en ziet een melding als laden of toevoegen mislukt; de API weigert een te grote body."
+profielversie: 1
+branch: "factory/001-todo-app-a"
+bijgewerkt: "2026-10-11T18:45"
+
+fase: tests
+ronde: 0
+testconflicten: 0
+wacht_op_mens: null
+
+volgende_stap: "testagent schrijft de tests voor slice A (AC-1 t/m AC-14, AC-44)"
+resterend_werk:
+  - "tests schrijven (testagent)"
+  - "bouwen (bouwer)"
+  - "review (security, ui, ux)"
+  - "opleverpakket"
+
+tests:
+  commit: null
+  aantal: 0
+
+dekking:
+  - criterium: AC-1
+    test: ""
+    status: geen-test
+  - criterium: AC-2
+    test: ""
+    status: geen-test
+  - criterium: AC-3
+    test: ""
+    status: geen-test
+  - criterium: AC-4
+    test: ""
+    status: geen-test
+  - criterium: AC-5
+    test: ""
+    status: geen-test
+  - criterium: AC-6
+    test: ""
+    status: geen-test
+  - criterium: AC-7
+    test: ""
+    status: geen-test
+  - criterium: AC-8
+    test: ""
+    status: geen-test
+  - criterium: AC-9
+    test: ""
+    status: geen-test
+  - criterium: AC-10
+    test: ""
+    status: geen-test
+  - criterium: AC-11
+    test: ""
+    status: geen-test
+  - criterium: AC-12
+    test: ""
+    status: geen-test
+  - criterium: AC-13
+    test: ""
+    status: geen-test
+  - criterium: AC-14
+    test: ""
+    status: geen-test
+  - criterium: AC-44
+    test: ""
+    status: geen-test
+
+bevindingen: []
+
+beslissingen: []
+
+verloop:
+  - tijd: "2026-10-11T18:45"
+    gebeurtenis: "Spec 001-todo-app versie 1 goedgekeurd door Jeffrey Bijl, na verwerking van zes open vragen; basisbranch main (keuze van de mens: origin/dev loopt achter); npm ci gedraaid met akkoord van de mens"
+  - tijd: "2026-10-11T18:45"
+    gebeurtenis: "Lokale git-identiteit Jeff-Software-Factory ingesteld (keuze van de mens); slice A opgezet op factory/001-todo-app-a vanaf main"
+
+verbruik:
+  inschatting: "~65 regels, ~4 bestanden, 1 ronde, laag (~4% van het weeklimiet)"
+  werkelijk:
+    - rol: spec-schrijver
+      model: opus
+      tokens: 49462
+    - rol: spec-schrijver
+      model: opus
+      tokens: 32784
+  totaal: null
+  limietstops: 0
+
+omvang:
+  regels: null
+  bestanden: null

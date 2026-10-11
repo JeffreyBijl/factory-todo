@@ -13,6 +13,7 @@ export class App implements OnInit {
 
 	protected readonly todos = signal<Todo[]>([]);
 	protected readonly fout = signal('');
+	protected readonly geladen = signal(false);
 	protected nieuweTitel = '';
 
 	async ngOnInit() {
@@ -20,7 +21,12 @@ export class App implements OnInit {
 	}
 
 	protected async laad() {
-		this.todos.set(await this.service.lijst());
+		try {
+			this.todos.set(await this.service.lijst());
+			this.geladen.set(true);
+		} catch {
+			this.fout.set('Laden mislukt');
+		}
 	}
 
 	protected async voegToe() {
@@ -31,8 +37,8 @@ export class App implements OnInit {
 			this.nieuweTitel = '';
 			this.fout.set('');
 			await this.laad();
-		} catch (e) {
-			this.fout.set(e instanceof Error ? e.message : 'Toevoegen mislukt');
+		} catch {
+			this.fout.set('Toevoegen mislukt');
 		}
 	}
 

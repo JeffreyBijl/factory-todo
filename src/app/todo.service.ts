@@ -12,6 +12,7 @@ export class TodoService {
 
 	async lijst(): Promise<Todo[]> {
 		const res = await fetch(this.basis);
+		if (!res.ok) throw new Error('Laden mislukt');
 		return (await res.json()) as Todo[];
 	}
 
@@ -21,7 +22,7 @@ export class TodoService {
 			headers: { 'content-type': 'application/json' },
 			body: JSON.stringify({ titel }),
 		});
-		if (!res.ok) throw new Error(((await res.json()) as { fout: string }).fout);
+		if (!res.ok) throw new Error('Toevoegen mislukt');
 		return (await res.json()) as Todo;
 	}
 

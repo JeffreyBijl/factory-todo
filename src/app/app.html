@@ -18,7 +18,9 @@
 		<p class="fout" role="alert">{{ fout() }}</p>
 	}
 
-	@if (todos().length === 0) {
+	@if (!geladen()) {
+		<!-- laden -->
+	} @else if (todos().length === 0) {
 		<p class="leeg">Nog niets te doen.</p>
 	} @else {
 		<ul>

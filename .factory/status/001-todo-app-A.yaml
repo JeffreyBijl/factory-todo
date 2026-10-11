@@ -5,16 +5,15 @@ slice: "A"
 gedrag: "De gebruiker voegt een todo met een titel toe, ziet hem onderaan de lijst en ziet een melding als laden of toevoegen mislukt; de API weigert een te grote body."
 profielversie: 1
 branch: "factory/001-todo-app-a"
-bijgewerkt: "2026-10-11T19:20"
+bijgewerkt: "2026-10-11T20:09"
 
-fase: review
+fase: opleverpakket
 ronde: 2
 testconflicten: 0
 wacht_op_mens: null
 
-volgende_stap: "review ronde 2 door security, ui en ux op 158cdf7"
+volgende_stap: "PR-tekst schrijven naar /tmp/factory-pr-001-todo-app-A.md, fase klaar, mens vragen om push en PR"
 resterend_werk:
-  - "review ronde 2 (security, ui, ux)"
   - "opleverpakket"
 
 tests:
@@ -75,32 +74,32 @@ bevindingen:
     ronde: 1
     wat: "Een lange titel zonder spaties (200 tekens, geldige invoer volgens AC-14) laat de pagina op 375 px horizontaal scrollen (scrollWidth 2363 px) en duwt de knop Verwijderen buiten beeld."
     waar: "src/app/app.css:44"
-    status: open
-    oplossing: ""
+    status: opgelost
+    oplossing: "li label flex 1 en min-width 0, titel overflow-wrap anywhere, knop flex-shrink 0 (158cdf7); door de orchestrator nagemeten op 375 px: scrollWidth 375, knop Verwijderen op x 315, 44x44 px"
   - id: B-2
     specialist: ui
     niveau: advies
     ronde: 1
     wat: "Aanraakdoelen kleiner dan 44 bij 44 px (verwijderknop 41x39, Toevoegen 106x38)."
     waar: "src/app/app.css:15, src/app/app.html:31-37"
-    status: open
-    oplossing: ""
+    status: opgelost
+    oplossing: "knoppen min 44x44 px, checkbox 1.5rem, li label min-height 44 px (158cdf7)"
   - id: B-3
     specialist: ui
     niveau: advies
     ronde: 1
     wat: "Tijdens het laden is niets te zien; voorstel: <p role=\"status\">Laden…</p> zolang niet geladen en geen fout."
     waar: "src/app/app.html:21-22"
-    status: open
-    oplossing: ""
+    status: opgelost
+    oplossing: "'Laden…' met role status zolang niet geladen en geen fout (158cdf7)"
   - id: B-4
     specialist: ui
     niveau: advies
     ronde: 1
     wat: "Contrast #777 op #fafafa ongeveer 4,3:1 (berekend), onder WCAG 4,5:1, voor 'Nog niets te doen.' en afgevinkte titels."
     waar: "src/app/app.css:50-56"
-    status: open
-    oplossing: ""
+    status: opgelost
+    oplossing: "grijs #777 vervangen door #666, circa 5,4:1 (158cdf7)"
   - id: B-5
     specialist: ux
     niveau: notitie
@@ -148,6 +147,10 @@ verloop:
     gebeurtenis: "Bouwer ronde 2: commit 158cdf7 (src/app/app.css, src/app/app.html); B-1 opgelost volgens de bouwer, adviezen B-2 t/m B-4 overgenomen."
   - tijd: "2026-10-11T19:20"
     gebeurtenis: "Zelf gecontroleerd: test-ratchet in orde; build, test (13), lint, format:check en e2e (9) groen. Omvang 62 regels erbij, 10 eraf, 5 bestanden: onder de alarmgrens."
+  - tijd: "2026-10-11T20:09"
+    gebeurtenis: "Review ronde 2: security, ui en ux geen nieuwe bevindingen; B-1 t/m B-4 niet opnieuw gemeld en daarmee opgelost; B-5 (notitie) blijft open. Werkmap en HEAD onveranderd na de review. B-1 zelf nagemeten op 375 px (scrollWidth 375)."
+  - tijd: "2026-10-11T20:09"
+    gebeurtenis: "Geen open blokkerende bevindingen: fase opleverpakket."
 
 verbruik:
   inschatting: "~65 regels, ~4 bestanden, 1 ronde, laag (~4% van het weeklimiet)"
@@ -176,9 +179,18 @@ verbruik:
     - rol: bouwer
       model: sonnet
       tokens: 19320
-  totaal: null
+    - rol: security
+      model: opus
+      tokens: 15478
+    - rol: ui
+      model: sonnet
+      tokens: 12448
+    - rol: ux
+      model: sonnet
+      tokens: 24182
+  totaal: "316.239 tokens; percentage van het weeklimiet niet gemeten"
   limietstops: 0
 
 omvang:
-  regels: null
-  bestanden: null
+  regels: 72
+  bestanden: 5

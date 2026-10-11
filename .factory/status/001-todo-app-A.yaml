@@ -5,7 +5,7 @@ slice: "A"
 gedrag: "De gebruiker voegt een todo met een titel toe, ziet hem onderaan de lijst en ziet een melding als laden of toevoegen mislukt; de API weigert een te grote body."
 profielversie: 1
 branch: "factory/001-todo-app-a"
-bijgewerkt: "2026-10-11T18:48"
+bijgewerkt: "2026-10-11T18:49"
 
 fase: wacht-op-mens
 ronde: 0
@@ -13,7 +13,7 @@ testconflicten: 0
 wacht_op_mens:
   reden: "geblokkeerd"
   sinds: "2026-10-11T18:48"
-  vraag: "Mag Playwright eenmalig Chromium downloaden (npx playwright install chromium, nieuw internetdomein), zodat de e2e-tests lokaal kunnen draaien en rood/groen controleerbaar is?"
+  vraag: "Chromium-download geblokkeerd door de firewall: cdn.playwright.dev toevoegen aan .devcontainer/allowlist.txt (verboden terrein, alleen de mens), of Chromium zelf installeren, of zonder lokale e2e verder?"
 
 volgende_stap: "na besluit over de Playwright-browser: e2e-tests van slice A draaien en controleren dat ze rood zijn om ontbrekend gedrag; dan fase bouwen, ronde 1, bouwer starten"
 resterend_werk:
@@ -88,6 +88,8 @@ verloop:
     gebeurtenis: "Advies testagent: e2e-bestanden delen één database; serial mode werkt alleen per bestand. Voorstel workers: 1 in playwright.config.ts (buiten de testmap; besluit van de mens, later)."
   - tijd: "2026-10-11T18:48"
     gebeurtenis: "Wacht op mens: Chromium voor Playwright downloaden is een nieuw internetdomein."
+  - tijd: "2026-10-11T18:49"
+    gebeurtenis: "Mens geeft akkoord op npx playwright install chromium; download faalt: de firewall blokkeert cdn.playwright.dev. Het domein staat niet in .devcontainer/allowlist.txt (verboden terrein)."
 
 verbruik:
   inschatting: "~65 regels, ~4 bestanden, 1 ronde, laag (~4% van het weeklimiet)"

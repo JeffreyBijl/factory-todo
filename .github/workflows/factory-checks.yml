@@ -97,8 +97,14 @@ jobs:
           REPO: ${{ github.repository }}
           SHA: ${{ github.event.pull_request.head.sha }}
           VAN_FORK: ${{ github.event.pull_request.head.repo.full_name != github.repository }}
+          BASIS: ${{ github.event.pull_request.base.ref }}
         run: |
-          if [ ! -f Dockerfile ] || [ ! -f .github/workflows/factory-preview.yml ] || [ "$VAN_FORK" = "true" ]; then
+          # De preview draait via pull_request_target, dus alleen als de workflow al op de basisbranch staat
+          # (niet in de PR die hem toevoegt).
+          if ! gh api "repos/$REPO/contents/.github/workflows/factory-preview.yml?ref=$BASIS" --silent 2>/dev/null; then
+            preview_op_basis=false
+          fi
+          if [ ! -f Dockerfile ] || [ "${preview_op_basis:-true}" = "false" ] || [ "$VAN_FORK" = "true" ]; then
             echo "::notice::Geen preview voor deze PR: E2E-tests draaien lokaal."
             exit 0
           fi

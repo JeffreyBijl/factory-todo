@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { App } from './app';
-import { TodoService } from './todo.service';
+import { TodoService } from './todos/todo.service';
 
 describe('App', () => {
 	beforeEach(async () => {

@@ -1,0 +1,27 @@
+form {
+	display: flex;
+	gap: 0.5rem;
+}
+
+input {
+	flex: 1;
+	padding: 0.5rem;
+	font-size: 1rem;
+}
+
+button {
+	padding: 0.5rem 0.75rem;
+	font-size: 1rem;
+	cursor: pointer;
+	min-width: 44px;
+	min-height: 44px;
+	flex-shrink: 0;
+}
+
+.verborgen {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+}

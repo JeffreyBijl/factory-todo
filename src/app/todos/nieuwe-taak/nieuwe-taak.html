@@ -1,0 +1,10 @@
+<form [formRoot]="taakForm">
+	<label for="nieuw" class="verborgen">Nieuwe taak</label>
+	<input
+		id="nieuw"
+		[formField]="taakForm.titel"
+		placeholder="Wat moet er gebeuren?"
+		autocomplete="off"
+	/>
+	<button type="submit">Toevoegen</button>
+</form>

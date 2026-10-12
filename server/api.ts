@@ -2,17 +2,26 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
 import type { Store } from './db.ts';
 
 export const MAX_TITEL = 200;
+export const MAX_BODY_BYTES = 10_240;
 
 export function json(res: ServerResponse, status: number, body?: unknown) {
 	res.writeHead(status, { 'content-type': 'application/json; charset=utf-8' });
 	res.end(body === undefined ? '' : JSON.stringify(body));
 }
 
+class BodyTeGroot extends Error {}
+
 async function leesJson(req: IncomingMessage): Promise<Record<string, unknown> | null> {
-	let data = '';
-	for await (const deel of req) data += deel;
+	const delen: Buffer[] = [];
+	let aantalBytes = 0;
+	for await (const deel of req) {
+		const stuk = Buffer.from(deel);
+		aantalBytes += stuk.length;
+		if (aantalBytes > MAX_BODY_BYTES) throw new BodyTeGroot();
+		delen.push(stuk);
+	}
 	try {
-		const body: unknown = JSON.parse(data || '{}');
+		const body: unknown = JSON.parse(Buffer.concat(delen).toString('utf8') || '{}');
 		return body && typeof body === 'object' ? (body as Record<string, unknown>) : null;
 	} catch {
 		return null;
@@ -21,6 +30,22 @@ async function leesJson(req: IncomingMessage): Promise<Record<string, unknown> |
 
 // Behandelt /api/todos. Geeft true terug als het verzoek is afgehandeld.
 export async function behandelApi(
+	req: IncomingMessage,
+	res: ServerResponse,
+	url: URL,
+	store: Store,
+): Promise<boolean> {
+	try {
+		return await verwerkApi(req, res, url, store);
+	} catch (e) {
+		if (!(e instanceof BodyTeGroot)) throw e;
+		res.setHeader('connection', 'close');
+		json(res, 413, { fout: `Body is te groot, maximaal ${MAX_BODY_BYTES} bytes` });
+		return true;
+	}
+}
+
+async function verwerkApi(
 	req: IncomingMessage,
 	res: ServerResponse,
 	url: URL,

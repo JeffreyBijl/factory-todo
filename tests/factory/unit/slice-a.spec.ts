@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { App } from '../../../src/app/app';
-import { TodoService } from '../../../src/app/todo.service';
+import { TodoService } from '../../../src/app/todos/todo.service';
 
 describe('Slice A: interface', () => {
 	beforeEach(async () => {

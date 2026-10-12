@@ -3,17 +3,18 @@ spec: "001-todo-app"
 spec_versie: 1
 slice: "A"
 gedrag: "De gebruiker voegt een todo met een titel toe, ziet hem onderaan de lijst en ziet een melding als laden of toevoegen mislukt; de API weigert een te grote body."
-profielversie: 1
+profielversie: 2
 branch: "factory/001-todo-app-a"
-bijgewerkt: "2026-10-11T20:09"
+bijgewerkt: "2026-10-12T13:00"
 
-fase: klaar
-ronde: 2
+fase: bouwen
+ronde: 3
 testconflicten: 0
 wacht_op_mens: null
 
-volgende_stap: "mens beslist over push en PR (gh pr create --base main --head factory/001-todo-app-a, body /tmp/factory-pr-001-todo-app-A.md); daarna poort 3 (merge door de mens) en slice B"
-resterend_werk: []
+volgende_stap: "bouwer ronde 3 met B-6 (herstructurering Angular-app); daarna zelf controleren en review door security, ui en ux"
+resterend_werk:
+  - "B-6: Angular-app opdelen in componenten met een betere architectuur en mappenstructuur, volgens de Angular-22-standaarden (stackkennis)"
 
 tests:
   commit: "081d84e"
@@ -107,6 +108,14 @@ bevindingen:
     waar: "src/app/app.ts:37-41"
     status: open
     oplossing: ""
+  - id: B-6
+    specialist: mens
+    niveau: blokkerend
+    ronde: 3
+    wat: "Review van Jeffrey Bijl op PR #2 (changes requested): de structuur van de Angular-app is niet goed; er moeten verschillende componenten komen en de architectuur en mappenstructuur moeten beter, volgens de nieuwe Angular-standaarden uit de MCP-server stack-angular."
+    waar: "src/app/"
+    status: open
+    oplossing: ""
 
 beslissingen:
   - "Tijdens het laden toont de lijst niets (ook niet \"Nog niets te doen.\"), zodat bij een mislukte GET alleen \"Laden mislukt\" staat (AC-10). Afgeleid uit de diff, niet uit een resultaatblok."
@@ -152,6 +161,10 @@ verloop:
     gebeurtenis: "Geen open blokkerende bevindingen: fase opleverpakket."
   - tijd: "2026-10-11T20:09"
     gebeurtenis: "Opleverpakket geschreven naar /tmp/factory-pr-001-todo-app-A.md, advies 'Let op' (2 rondes i.p.v. 1, gevoelig gebied server/** geraakt, open notitie B-5). Fase klaar."
+  - tijd: "2026-10-12T10:38"
+    gebeurtenis: "Mens (Jeffrey Bijl) vraagt wijzigingen op PR #2: Angular-app opdelen in componenten, betere architectuur en mappenstructuur, nieuwe Angular-standaarden via de MCP. Vastgelegd als blokkerende bevinding B-6."
+  - tijd: "2026-10-12T13:00"
+    gebeurtenis: "Mens akkoord met ronde 3 (laatste volgens max_rondes). main (stackkennis, profiel versie 2) in de branch gemerged (64d38f5); profielversie 2. Fase bouwen, ronde 3."
 
 verbruik:
   inschatting: "~65 regels, ~4 bestanden, 1 ronde, laag (~4% van het weeklimiet)"

@@ -4,10 +4,10 @@
 # De factory stelt wijzigingen voor; alleen de mens keurt ze goed en verhoogt de versie.
 
 schema: 1
-versie: 1
+versie: 2
 goedgekeurd:
   door: "Jeffrey Bijl"
-  op: "2026-10-11"
+  op: "2026-10-12"
 project:
   naam: "factory-todo"
   repo: "JeffreyBijl/factory-todo"
@@ -35,6 +35,29 @@ stack:
     e2e: "Playwright"
   formatter: "Prettier met tabs"
 
+# Officiële hulp per onderdeel van de stack; alleen wat de mens heeft goedgekeurd, met reden.
+stackkennis:
+  - onderdeel: "Angular 22"
+    waarom: "Angular 22 is nieuwer dan veel trainingsdata (OnPush standaard, Signal Forms, @Service); de best practices en de documentatie komen van het Angular-team voor deze versie"
+    mcp:
+      naam: "stack-angular"
+      commando: "npx ng mcp --read-only"
+      domeinen: [angular.dev, L1XWT2UJ7F-dsn.algolia.net]
+    regels: [CLAUDE.md]
+    documentatie: "https://angular.dev, versie 22"
+  - onderdeel: "TypeScript 6 op Node 22/24, server op node:http"
+    waarom: "geen officiële AI-hulp die iets toevoegt; de agents gebruiken de documentatie van de versie in het project"
+    documentatie: "https://www.typescriptlang.org/docs/ en https://nodejs.org/docs/latest-v22.x/api/"
+  - onderdeel: "SQLite via node:sqlite"
+    waarom: "geen officiële AI-hulp; node:sqlite is nieuw, dus de agents volgen de Node-documentatie"
+    documentatie: "https://nodejs.org/docs/latest-v22.x/api/sqlite.html"
+  - onderdeel: "Vitest 5"
+    waarom: "geen officiële AI-hulp; de agents gebruiken de documentatie van de versie in de lockfile"
+    documentatie: "https://vitest.dev"
+  - onderdeel: "Playwright 1.64"
+    waarom: "de plugin van Microsoft voegt niets toe: de evaluator gebruikt Playwright uit het project"
+    documentatie: "https://playwright.dev/docs/intro"
+
 # Map met de tests van de testagent; valt onder de test-ratchet en CODEOWNERS.
 # unit/ (Angular, *.spec.ts), server/ (API, *.test.ts), e2e/ (Playwright, *.spec.ts)
 testmap: "tests/factory/"
@@ -45,6 +68,8 @@ verboden_terrein:
   - .devcontainer/
   - .factory/profiel.yaml
   - CLAUDE.md
+  - .mcp.json
+  - .claude/
   - Dockerfile
   - .dockerignore
 
@@ -91,3 +116,6 @@ wijzigingen:
   - versie: 1
     op: "2026-10-11"
     wat: "Eerste profiel na de kennismaking"
+  - versie: 2
+    op: "2026-10-12"
+    wat: "Stackkennis toegevoegd (Angular: CLAUDE.md en MCP-server stack-angular met zoeken in de documentatie); .mcp.json en .claude/ op verboden terrein"

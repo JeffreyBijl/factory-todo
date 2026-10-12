@@ -1,12 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Service } from '@angular/core';
+import { Todo } from './todos/todo.model';
 
-export interface Todo {
-	id: number;
-	titel: string;
-	gedaan: boolean;
-}
-
-@Injectable({ providedIn: 'root' })
+@Service()
 export class TodoService {
 	private readonly basis = '/api/todos';
 

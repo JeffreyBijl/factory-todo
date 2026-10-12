@@ -1,0 +1,11 @@
+<label>
+	<input type="checkbox" [checked]="todo().gedaan" (change)="gewisseld.emit(todo())" />
+	<span>{{ todo().titel }}</span>
+</label>
+<button
+	type="button"
+	(click)="verwijderd.emit(todo())"
+	[attr.aria-label]="'Verwijder ' + todo().titel"
+>
+	✕
+</button>

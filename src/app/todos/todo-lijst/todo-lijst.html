@@ -1,0 +1,19 @@
+@if (!geladen()) {
+	@if (!heeftFout()) {
+		<p class="leeg" role="status">Laden…</p>
+	}
+} @else if (todos().length === 0) {
+	<p class="leeg">Nog niets te doen.</p>
+} @else {
+	<ul>
+		@for (todo of todos(); track todo.id) {
+			<li>
+				<app-todo-item
+					[todo]="todo"
+					(gewisseld)="gewisseld.emit($event)"
+					(verwijderd)="verwijderd.emit($event)"
+				/>
+			</li>
+		}
+	</ul>
+}

@@ -5,17 +5,14 @@ slice: "A"
 gedrag: "De gebruiker voegt een todo met een titel toe, ziet hem onderaan de lijst en ziet een melding als laden of toevoegen mislukt; de API weigert een te grote body."
 profielversie: 2
 branch: "factory/001-todo-app-a"
-bijgewerkt: "2026-10-12T13:10"
+bijgewerkt: "2026-10-12T13:15"
 
-fase: wacht-op-mens
+fase: tests
 ronde: 3
-testconflicten: 0
-wacht_op_mens:
-  reden: alarmgrens
-  sinds: "2026-10-12T13:10"
-  vraag: "De PR raakt 17 bestanden (grens 15) door de opsplitsing in componenten (B-6). Doorgaan naar de review, of de slice anders opknippen? En moet TodoService ook naar src/app/todos/ (dan past de testagent de import in de unit-test aan)?"
+testconflicten: 1
+wacht_op_mens: null
 
-volgende_stap: "na het besluit van de mens: eventueel testagent (importpad TodoService) en bouwer in ronde 3; daarna review ronde 3 door security, ui en ux"
+volgende_stap: "testagent past het importpad van TodoService in tests/factory/unit/slice-a.spec.ts aan naar src/app/todos/todo.service; daarna bouwer verplaatst de service (ronde 3); daarna review ronde 3 door security, ui en ux"
 resterend_werk:
   - "B-6: Angular-app opdelen in componenten met een betere architectuur en mappenstructuur, volgens de Angular-22-standaarden (stackkennis)"
 
@@ -172,6 +169,8 @@ verloop:
     gebeurtenis: "Bouwer ronde 3: commit e1f1955 (src/app/, 16 bestanden); B-6 opgelost volgens de bouwer. Vraag van de bouwer: TodoService ook naar src/app/todos/ (vergt aanpassing van de import door de testagent)."
   - tijd: "2026-10-12T13:10"
     gebeurtenis: "Zelf gecontroleerd: test-ratchet in orde; build, test (13), lint, format:check en e2e (9) groen. Omvang 293 regels erbij, 143 eraf, 17 bestanden: boven de alarmgrens van 15 bestanden. Poort 2, reden alarmgrens."
+  - tijd: "2026-10-12T13:15"
+    gebeurtenis: "Besluit mens (Jeffrey Bijl): doorgaan naar de review ondanks 17 bestanden; TodoService verhuist naar src/app/todos/. Testconflict 1: de testagent past alleen het importpad in de unit-test aan."
 
 verbruik:
   inschatting: "~65 regels, ~4 bestanden, 1 ronde, laag (~4% van het weeklimiet)"

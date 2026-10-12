@@ -5,14 +5,14 @@ slice: "A"
 gedrag: "De gebruiker voegt een todo met een titel toe, ziet hem onderaan de lijst en ziet een melding als laden of toevoegen mislukt; de API weigert een te grote body."
 profielversie: 2
 branch: "factory/001-todo-app-a"
-bijgewerkt: "2026-10-12T13:20"
+bijgewerkt: "2026-10-12T13:30"
 
-fase: bouwen
+fase: review
 ronde: 3
 testconflicten: 1
 wacht_op_mens: null
 
-volgende_stap: "bouwer verplaatst TodoService naar src/app/todos/ (ronde 3); daarna review ronde 3 door security, ui en ux"
+volgende_stap: "review ronde 3 door security, ui en ux; daarna opleverpakket bijwerken of escalatie"
 resterend_werk:
   - "B-6: Angular-app opdelen in componenten met een betere architectuur en mappenstructuur, volgens de Angular-22-standaarden (stackkennis)"
 
@@ -173,6 +173,10 @@ verloop:
     gebeurtenis: "Besluit mens (Jeffrey Bijl): doorgaan naar de review ondanks 17 bestanden; TodoService verhuist naar src/app/todos/. Testconflict 1: de testagent past alleen het importpad in de unit-test aan."
   - tijd: "2026-10-12T13:20"
     gebeurtenis: "Testagent: commit 47159ec, alleen het importpad van TodoService in tests/factory/unit/slice-a.spec.ts (gecontroleerd met git show). Ratchet telt 15 tests, gelijk aan voorheen. AC-7 rood tot de bouwer de service verplaatst."
+  - tijd: "2026-10-12T13:30"
+    gebeurtenis: "Bouwer ronde 3: commit bffedaf (TodoService naar src/app/todos/ met git mv, imports in todo.store.ts en app.spec.ts aangepast)."
+  - tijd: "2026-10-12T13:30"
+    gebeurtenis: "Zelf gecontroleerd: test-ratchet in orde (gelijk aan 47159ec); build, test (13), lint, format:check en e2e (9) groen. Omvang 294 regels erbij, 144 eraf, 18 bestanden: boven de alarmgrens; de mens besloot al door te gaan, de extra bestand komt door de verhuizing die de mens koos. Fase review, ronde 3."
 
 verbruik:
   inschatting: "~65 regels, ~4 bestanden, 1 ronde, laag (~4% van het weeklimiet)"
@@ -216,9 +220,12 @@ verbruik:
     - rol: testagent
       model: sonnet
       tokens: 14997
-  totaal: "379.668 tokens; percentage van het weeklimiet niet gemeten"
+    - rol: bouwer
+      model: sonnet
+      tokens: 16164
+  totaal: "395.832 tokens; percentage van het weeklimiet niet gemeten"
   limietstops: 0
 
 omvang:
-  regels: 436
-  bestanden: 17
+  regels: 438
+  bestanden: 18

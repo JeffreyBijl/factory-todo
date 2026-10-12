@@ -29,3 +29,7 @@ update.code.visualstudio.com
 
 # --- Project ---
 # Extra registries of diensten van dit project, met akkoord van de mens.
+
+# Angular MCP (stack-angular): zoeken in de documentatie van Angular
+angular.dev
+L1XWT2UJ7F-dsn.algolia.net

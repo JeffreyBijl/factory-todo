@@ -1,0 +1,6 @@
+{
+	"enabledMcpjsonServers": ["stack-angular"],
+	"permissions": {
+		"allow": ["mcp__stack-angular"]
+	}
+}

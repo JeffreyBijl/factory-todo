@@ -1,5 +1,5 @@
 import { Service } from '@angular/core';
-import { Todo } from './todos/todo.model';
+import { Todo } from './todo.model';
 
 @Service()
 export class TodoService {

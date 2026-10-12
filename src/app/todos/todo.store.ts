@@ -1,5 +1,5 @@
 import { inject, Service, signal } from '@angular/core';
-import { TodoService } from '../todo.service';
+import { TodoService } from './todo.service';
 import { Todo } from './todo.model';
 
 /** Houdt de staat van de todo-lijst bij en voert de acties uit. */

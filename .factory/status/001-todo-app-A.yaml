@@ -5,19 +5,19 @@ slice: "A"
 gedrag: "De gebruiker voegt een todo met een titel toe, ziet hem onderaan de lijst en ziet een melding als laden of toevoegen mislukt; de API weigert een te grote body."
 profielversie: 2
 branch: "factory/001-todo-app-a"
-bijgewerkt: "2026-10-12T13:15"
+bijgewerkt: "2026-10-12T13:20"
 
-fase: tests
+fase: bouwen
 ronde: 3
 testconflicten: 1
 wacht_op_mens: null
 
-volgende_stap: "testagent past het importpad van TodoService in tests/factory/unit/slice-a.spec.ts aan naar src/app/todos/todo.service; daarna bouwer verplaatst de service (ronde 3); daarna review ronde 3 door security, ui en ux"
+volgende_stap: "bouwer verplaatst TodoService naar src/app/todos/ (ronde 3); daarna review ronde 3 door security, ui en ux"
 resterend_werk:
   - "B-6: Angular-app opdelen in componenten met een betere architectuur en mappenstructuur, volgens de Angular-22-standaarden (stackkennis)"
 
 tests:
-  commit: "081d84e"
+  commit: "47159ec"
   aantal: 15
 
 dekking:
@@ -171,6 +171,8 @@ verloop:
     gebeurtenis: "Zelf gecontroleerd: test-ratchet in orde; build, test (13), lint, format:check en e2e (9) groen. Omvang 293 regels erbij, 143 eraf, 17 bestanden: boven de alarmgrens van 15 bestanden. Poort 2, reden alarmgrens."
   - tijd: "2026-10-12T13:15"
     gebeurtenis: "Besluit mens (Jeffrey Bijl): doorgaan naar de review ondanks 17 bestanden; TodoService verhuist naar src/app/todos/. Testconflict 1: de testagent past alleen het importpad in de unit-test aan."
+  - tijd: "2026-10-12T13:20"
+    gebeurtenis: "Testagent: commit 47159ec, alleen het importpad van TodoService in tests/factory/unit/slice-a.spec.ts (gecontroleerd met git show). Ratchet telt 15 tests, gelijk aan voorheen. AC-7 rood tot de bouwer de service verplaatst."
 
 verbruik:
   inschatting: "~65 regels, ~4 bestanden, 1 ronde, laag (~4% van het weeklimiet)"
@@ -211,7 +213,10 @@ verbruik:
     - rol: bouwer
       model: sonnet
       tokens: 48432
-  totaal: "364.671 tokens; percentage van het weeklimiet niet gemeten"
+    - rol: testagent
+      model: sonnet
+      tokens: 14997
+  totaal: "379.668 tokens; percentage van het weeklimiet niet gemeten"
   limietstops: 0
 
 omvang:

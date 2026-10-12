@@ -5,16 +5,15 @@ slice: "A"
 gedrag: "De gebruiker voegt een todo met een titel toe, ziet hem onderaan de lijst en ziet een melding als laden of toevoegen mislukt; de API weigert een te grote body."
 profielversie: 2
 branch: "factory/001-todo-app-a"
-bijgewerkt: "2026-10-12T13:30"
+bijgewerkt: "2026-10-12T13:45"
 
-fase: review
+fase: klaar
 ronde: 3
 testconflicten: 1
 wacht_op_mens: null
 
-volgende_stap: "review ronde 3 door security, ui en ux; daarna opleverpakket bijwerken of escalatie"
-resterend_werk:
-  - "B-6: Angular-app opdelen in componenten met een betere architectuur en mappenstructuur, volgens de Angular-22-standaarden (stackkennis)"
+volgende_stap: "mens beslist over push naar factory/001-todo-app-a en het bijwerken van de PR-tekst van PR #2 (body /tmp/factory-pr-001-todo-app-A.md); daarna poort 3 (merge door de mens) en slice B"
+resterend_werk: []
 
 tests:
   commit: "47159ec"
@@ -114,8 +113,8 @@ bevindingen:
     ronde: 3
     wat: "Review van Jeffrey Bijl op PR #2 (changes requested): de structuur van de Angular-app is niet goed; er moeten verschillende componenten komen en de architectuur en mappenstructuur moeten beter, volgens de nieuwe Angular-standaarden uit de MCP-server stack-angular."
     waar: "src/app/"
-    status: open
-    oplossing: ""
+    status: opgelost
+    oplossing: "frontend opgesplitst in standalone componenten en een feature-map src/app/todos/ (nieuwe-taak, foutmelding, todo-lijst, todo-item, todo.store, todo.model, todo.service), Signal Forms en @Service volgens de stackkennis (e1f1955, bffedaf); security, ui en ux zonder nieuwe bevindingen in ronde 3. Het oordeel over de structuur is aan de mens bij de merge."
 
 beslissingen:
   - "Tijdens het laden toont de lijst niets (ook niet \"Nog niets te doen.\"), zodat bij een mislukte GET alleen \"Laden mislukt\" staat (AC-10). Afgeleid uit de diff, niet uit een resultaatblok."
@@ -177,6 +176,10 @@ verloop:
     gebeurtenis: "Bouwer ronde 3: commit bffedaf (TodoService naar src/app/todos/ met git mv, imports in todo.store.ts en app.spec.ts aangepast)."
   - tijd: "2026-10-12T13:30"
     gebeurtenis: "Zelf gecontroleerd: test-ratchet in orde (gelijk aan 47159ec); build, test (13), lint, format:check en e2e (9) groen. Omvang 294 regels erbij, 144 eraf, 18 bestanden: boven de alarmgrens; de mens besloot al door te gaan, de extra bestand komt door de verhuizing die de mens koos. Fase review, ronde 3."
+  - tijd: "2026-10-12T13:45"
+    gebeurtenis: "Review ronde 3: security, ui en ux geen nieuwe bevindingen; ui mat B-1 t/m B-4 opnieuw na (375 px: scrollWidth 375, knoppen 44x44); security: server/, package.json en proxy.conf.json niet gewijzigd sinds ronde 2, frontend toont nu vaste foutteksten. B-5 (notitie) blijft open. Werkmap en HEAD (e29d416) onveranderd na de review."
+  - tijd: "2026-10-12T13:45"
+    gebeurtenis: "Geen open blokkerende bevindingen: B-6 opgelost. Opleverpakket bijgewerkt naar /tmp/factory-pr-001-todo-app-A.md, advies 'Let op' (3 rondes i.p.v. 1, 18 bestanden boven de alarmgrens met akkoord van de mens, gevoelig gebied server/** geraakt, open notitie B-5). Fase klaar."
 
 verbruik:
   inschatting: "~65 regels, ~4 bestanden, 1 ronde, laag (~4% van het weeklimiet)"
@@ -223,7 +226,16 @@ verbruik:
     - rol: bouwer
       model: sonnet
       tokens: 16164
-  totaal: "395.832 tokens; percentage van het weeklimiet niet gemeten"
+    - rol: security
+      model: opus
+      tokens: 47092
+    - rol: ui
+      model: sonnet
+      tokens: 24837
+    - rol: ux
+      model: sonnet
+      tokens: 35555
+  totaal: "503.316 tokens; percentage van het weeklimiet niet gemeten"
   limietstops: 0
 
 omvang:
